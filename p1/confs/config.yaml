@@ -1,0 +1,13 @@
+CentOS_version: ">= 0"
+server:
+  cpus: 1
+  memory: 1024
+node:
+  count: 1
+  cpus: 1
+  memory: 1024
+ip:
+  server: 172.22.101.101
+  node: 172.22.101.111
+net:
+  network_type: private_network

@@ -1,0 +1,47 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+require 'yaml'
+
+VAGRANTFILE_API_VERSION = "2"
+conf = YAML.load_file(FILE.join(FILE.dirname(__FILE__), 'confs/config.yaml'))
+
+Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
+    config.vm.provision :shell, inline: "echo Server and Worker Nodes Configuration"
+    config.vm.box_check_update = false
+
+    config.vm.define "ishaimouS" do |server|
+        server.vm.box = "centos/8"
+        server.vm.box_version = ">= 0"
+        server.vm.guest = :linux
+        server.vm.provider "virtualbox" do |vb|
+            vb.customize ["modifyvm", :id, "--natdnsproxy1", "on", "--natdnshostresolver1", "on"]
+            vb.name = "ishaimouS"
+            vb.gui = false
+            vb.memory = 1024
+            vb.cpus = 1
+        end
+        server.vm.network "private_network", ip: "192.168.42.110"
+        server.vm.hostname = "ishaimouS"
+        server.vm.provision :shell, inline: "echo installing k3s server on ishaimouS Server Node"
+        server.vm.provision :shell, path: "./scripts/ishaimouS.sh"
+    end
+
+    config.vm.define "ishaimouSW" do |worker|
+        worker.vm.box = "centos/8"
+        worker.vm.box_version = ">= 0"
+        server.vm.guest = :linux
+        worker.vm.provider "virtualbox" do |vb|
+            vb.customize ["modifyvm", :id, "--natdnsproxy1", "on", "--natdnshostresolver1", "on"]
+            vb.name = "ishaimouSW"
+            vb.gui = false
+            vb.memory = 1024
+            vb.cpus = 1
+        end
+        worker.vm.network "private_network", ip: "192.168.42.111"
+        worker.vm.hostname = "ishaimouSW"
+        worker.vm.provision :shell, inline: "echo installing k3s agent on ishaimouSW Worker Node"
+        worker.vm.provision :shell, path: "./scripts/ishaimouSW.sh"
+    end
+    
+end
