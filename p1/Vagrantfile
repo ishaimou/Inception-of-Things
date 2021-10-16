@@ -16,6 +16,8 @@ OS_VERSION = c.fetch('OS_version')
 OS_URL = c.fetch('OS_url')
 
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
+    server_ip = c.fetch('ip').fetch('server')
+
     config.vagrant.plugins = ['vagrant-vbguest']
     config.vbguest.auto_update = true
     config.vbguest.installer_options = { allow_kernel_upgrade: true }
@@ -23,10 +25,9 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     config.vm.box_version = OS_VERSION
     config.vm.box_url = OS_URL
     config.vm.box_check_update = false
-
+    
     config.vm.define "ishaimouS" do |server|
         s = c.fetch('server')
-        server_ip = c.fetch('ip').fetch('server')
         server.vm.provider "virtualbox" do |vb|
             vb.customize ["modifyvm", :id, "--natdnsproxy1", "on", "--natdnshostresolver1", "on"]
             vb.name = "ishaimouS"
@@ -38,7 +39,10 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
         server.vm.network c.fetch('net').fetch('network_type'), ip: server_ip
         server.vm.hostname = "ishaimouS"
         server.vm.provision :shell, inline: "echo installing k3s server on ishaimouS Server Node"
-        server.vm.provision :shell, path: "./scripts/ishaimouS.sh"
+        server.vm.provision "shell" do |s|
+            s.path = "./scripts/ishaimouS.sh"
+            s.args = [server_ip]
+        end
     end
 
     config.vm.define "ishaimouSW" do |node|
@@ -55,7 +59,10 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
         node.vm.network c.fetch('net').fetch('network_type'), ip: node_ip
         node.vm.hostname = "ishaimouSW"
         node.vm.provision :shell, inline: "echo installing k3s agent on ishaimouSW Worker Node"
-        node.vm.provision :shell, path: "./scripts/ishaimouSW.sh"
+        node.vm.provision "shell" do |s|
+            s.path = "./scripts/ishaimouSW.sh"
+            s.args = [server_ip]
+        end
     end
     
 end
