@@ -1,13 +1,14 @@
-CentOS_version: ">= 0"
+OS_name: "centos/8"
+OS_version: ">= 0"
+OS_url: "https://vagrantcloud.com/centos/8"
 server:
   cpus: 1
   memory: 1024
 node:
-  count: 1
   cpus: 1
   memory: 1024
 ip:
-  server: 172.22.101.101
-  node: 172.22.101.111
+  server: "192.168.42.110"
+  node: "192.168.42.111"
 net:
-  network_type: private_network
+  network_type: "private_network"
