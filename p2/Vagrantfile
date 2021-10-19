@@ -16,14 +16,13 @@ OS_VERSION = c.fetch('OS_version')
 OS_URL = c.fetch('OS_url')
 
 # Disable Firewall
-$DISABLE_FIREWALL = <<-SHELL
+DISABLE_FIREWALL = <<-SHELL
     echo "Disabling Firewall..."
     sudo systemctl disable firewalld --now
     SHELL
 
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
-    server_ip = c.fetch('ip').fetch('server')
-
+    
     config.vagrant.plugins = ['vagrant-vbguest']
     config.vbguest.auto_update = true
     config.vbguest.installer_options = { allow_kernel_upgrade: true }
@@ -31,10 +30,11 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     config.vm.box_version = OS_VERSION
     config.vm.box_url = OS_URL
     config.vm.box_check_update = false
-    config.vm.provision "shell", inline: $DISABLE_FIREWALL
+    config.vm.provision "shell", inline: DISABLE_FIREWALL
     
     config.vm.define "ishaimouS" do |server|
         s = c.fetch('server')
+        server_ip = s.fetch('ip')
         server.vm.provider "virtualbox" do |vb|
             vb.customize ["modifyvm", :id, "--natdnsproxy1", "on", "--natdnshostresolver1", "on"]
             vb.name = "ishaimouS"
@@ -46,22 +46,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
         server.vm.hostname = "ishaimouS"
         server.vm.provision "shell", inline: "echo installing k3s server on ishaimouS Server"
         server.vm.provision "shell", path: "./scripts/ishaimouS.sh", args: [server_ip]
-    end
-
-    config.vm.define "ishaimouSW" do |node|
-        n = c.fetch('node')
-        node_ip =  c.fetch('ip').fetch('node')
-        node.vm.provider "virtualbox" do |vb|
-            vb.customize ["modifyvm", :id, "--natdnsproxy1", "on", "--natdnshostresolver1", "on"]
-            vb.name = "ishaimouSW"
-            vb.memory = n.fetch('memory')
-            vb.cpus = n.fetch('cpus')
-        end
-        node.vm.synced_folder "./confs", "/vagrant_shared"
-        node.vm.network c.fetch('net').fetch('network_type'), ip: node_ip
-        node.vm.hostname = "ishaimouSW"
-        node.vm.provision "shell", inline: "echo installing k3s agent on ishaimouSW Worker Node"
-        node.vm.provision "shell", path: "./scripts/ishaimouSW.sh", args: [server_ip]
+        server.vm.provision "shell", path: "./scripts/deploy.sh"
     end
     
 end

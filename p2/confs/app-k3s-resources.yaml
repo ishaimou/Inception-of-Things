@@ -1,0 +1,194 @@
+# Deployments
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app-one
+  labels:
+    app: app-one
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: app-one
+  template:
+    metadata:
+      labels:
+        app: app-one
+    spec:
+      containers:
+        - name: app-one
+          image: nginx
+          ports:
+            - containerPort: 80
+          volumeMounts:
+            - name: app-one
+              mountPath: /usr/share/nginx/html
+      volumes:
+        - name: app-one
+          configMap:
+            name: app-one
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app-two
+  labels:
+    app: app-two
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: app-two
+  template:
+    metadata:
+      labels:
+        app: app-two
+    spec:
+      containers:
+        - name: nginx
+          image: nginx
+          ports:
+            - containerPort: 80
+          volumeMounts:
+            - name: app-two
+              mountPath: /usr/share/nginx/html
+      volumes:
+        - name: app-two
+          configMap:
+            name: app-two
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app-three
+  labels:
+    app: app-three
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: app-three
+  template:
+    metadata:
+      labels:
+        app: app-three
+    spec:
+      containers:
+        - name: app-three
+          image: nginx
+          ports:
+            - containerPort: 80
+          volumeMounts:
+            - name: app-three
+              mountPath: /usr/share/nginx/html
+      volumes:
+        - name: app-three
+          configMap:
+            name: app-three
+
+# Services
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: app-one
+spec:
+  selector:
+    app: app-one
+  ports:
+    - name: http
+      protocol: TCP
+      port: 80
+      targetPort: 80
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: app-two
+spec:
+  selector:
+    app: app-two
+  ports:
+    - name: http
+      protocol: TCP
+      port: 80
+      targetPort: 80
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: app-three
+spec:
+  selector:
+    app: app-three
+  ports:
+    - name: http
+      protocol: TCP
+      port: 80
+      targetPort: 80
+
+# ConfigMaps
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app-one
+  namespace: default
+  labels:
+    app: app-one
+data:
+  index.html: |
+    <!DOCTYPE html>
+    <html>
+      <head>
+        <title>App One</title>
+      </head>
+      <body>
+        <h1>Hello from App one!</h1>
+      </body>
+    </html>
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app-two
+  namespace: default
+  labels:
+    app: app-two
+data:
+  index.html: |
+    <!DOCTYPE html>
+    <html>
+      <head>
+        <title>App Two</title>
+      </head>
+      <body>
+        <h1>Hello from App two!</h1>
+      </body>
+    </html>
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app-three
+  namespace: default
+  labels:
+    app: app-three
+data:
+  index.html: |
+    <!DOCTYPE html>
+    <html>
+      <head>
+        <title>App Three</title>
+      </head>
+      <body>
+        <h1>Hello from App three!</h1>
+      </body>
+    </html>

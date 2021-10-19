@@ -1,0 +1,9 @@
+OS_name: centos/8
+OS_version: ">= 0"
+OS_url: https://vagrantcloud.com/centos/8
+server:
+  cpus: 1
+  memory: 1024
+  ip: 192.168.42.110
+net:
+  network_type: private_network
