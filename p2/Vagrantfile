@@ -16,7 +16,7 @@ OS_VERSION = c.fetch('OS_version')
 OS_URL = c.fetch('OS_url')
 
 # Disable Firewall
-DISABLE_FIREWALL = <<-SHELL
+$DISABLE_FIREWALL = <<-SHELL
     echo "Disabling Firewall..."
     sudo systemctl disable firewalld --now
     SHELL
@@ -30,13 +30,12 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     config.vm.box_version = OS_VERSION
     config.vm.box_url = OS_URL
     config.vm.box_check_update = false
-    config.vm.provision "shell", inline: DISABLE_FIREWALL
+    config.vm.provision "shell", inline: $DISABLE_FIREWALL
     
     config.vm.define "ishaimouS" do |server|
         s = c.fetch('server')
         server_ip = s.fetch('ip')
         server.vm.provider "virtualbox" do |vb|
-            vb.customize ["modifyvm", :id, "--natdnsproxy1", "on", "--natdnshostresolver1", "on"]
             vb.name = "ishaimouS"
             vb.memory = s.fetch('memory')
             vb.cpus = s.fetch('cpus')
