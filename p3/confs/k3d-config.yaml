@@ -1,6 +1,6 @@
 apiVersion: k3d.io/v1alpha3
 kind: Simple
-name: ishaimou-cluster
+name: p3-cluster
 servers: 1
 ports:
   - port: 8080:80
