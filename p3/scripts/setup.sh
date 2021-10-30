@@ -2,9 +2,6 @@
 
 # --- Environnement Setup --- #
 
-# Disable firewall
-sudo systemctl disable firewalld --now
-
 # Install Docker Engine on Centos8
 # Set up Docker repository
 sudo yum install -y yum-utils
