@@ -15,10 +15,6 @@ sudo yum install docker-ce docker-ce-cli containerd.io --allowerasing -y
 sudo systemctl start docker
 
 # Post-installation Configuration
-# Manage Docker as a non-root user
-sudo usermod -aG docker $USER
-newgrp docker
-
 # Configure Docker to start on boot
 sudo systemctl enable docker.service
 sudo systemctl enable containerd.service
@@ -73,3 +69,5 @@ kubectl -n argocd patch secret argocd-secret \
 
 # Install argocd App
 kubectl apply -f ../confs/argocd-app.yaml -n argocd
+
+# kubectl get applications -n argocd
